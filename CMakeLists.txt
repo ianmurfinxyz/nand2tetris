@@ -30,5 +30,7 @@ include_directories(${PROJECT_SOURCE_DIR}/gtest/lib/googlemock/include)
 add_executable(test_assembler
         assembler/test/cli_test.cc
         assembler/src/cli.cc
-        assembler/src/error.cc)
+        assembler/src/error.cc
+        assembler/src/tokenizer.cc
+        assembler/test/tokenizer_test.cc)
 target_link_libraries(test_assembler gtest_main)
