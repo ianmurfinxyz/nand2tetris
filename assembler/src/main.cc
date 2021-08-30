@@ -4,7 +4,7 @@
 #include "error.hh"
 #include "tokenizer.hh"
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
   using namespace hackasm;
   auto cli_ = cli{};

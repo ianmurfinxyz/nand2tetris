@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 #include <cstdint>
-#include "cmd.hpp"
+#include "cmd.hh"
 
 namespace hackasm
 {

@@ -15,8 +15,7 @@ add_executable(assembler
         assembler/src/cli.cc
         assembler/src/error.cc
         assembler/src/log.cc
-        assembler/src/tokenizer.cc
-        assembler/test/test.cc)
+        assembler/src/tokenizer.cc)
 add_executable(virtual_machine virtual_machine/src/main.cc)
 add_executable(compiler compiler/src/main.cc)
 add_executable(emulator emulator/src/main.cc)
@@ -28,5 +27,8 @@ add_executable(emulator emulator/src/main.cc)
 add_subdirectory(${PROJECT_SOURCE_DIR}/gtest/lib)
 include_directories(${PROJECT_SOURCE_DIR}/gtest/lib/googletest/include)
 include_directories(${PROJECT_SOURCE_DIR}/gtest/lib/googlemock/include)
-add_executable(test_assembler assembler/test/test.cc)
-target_link_libraries(test_assembler gtest gtest_main)
+add_executable(test_assembler
+        assembler/test/cli_test.cc
+        assembler/src/cli.cc
+        assembler/src/error.cc)
+target_link_libraries(test_assembler gtest_main)

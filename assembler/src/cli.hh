@@ -30,17 +30,17 @@ public:
     std::string in_filename;
 
     /** name of hack machine instruction output file. */
-    std::string out_filename;
+    std::string out_filename = "a.out";
 
     /** format of output hack machine instruction file. */
-    hack_out_fmt out_fmt;
+    hack_out_fmt out_fmt = HACKOUT_TEXT;
 
     /** help flag was passed? */
-    bool help_bit;
+    bool help_bit = false;
   };
 
   /** Definition of all CLI options. */
-  static constexpr const char* short_opts {"f:ho:"};
+  static constexpr const char* short_opts {":f:ho:"};
   static constexpr struct option long_opts[] = {
     /*-------------------------------------------------------
      * name      has_arg            n/a       short_name
@@ -61,7 +61,7 @@ public:
   /** Prints the programs help message to stdout. */
   static void print_help();
 
-  const settings& get_settings() const {return _settings;}
+  [[nodiscard]] const settings& get_settings() const {return _settings;}
 
 private:
   static hack_out_fmt id_out_fmt(const char* out_fmt_str);

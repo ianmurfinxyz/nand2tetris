@@ -22,24 +22,7 @@ enum class token_type
   int_const,
 };
 
-std::ostream& operator<<(std::ostream&, token_type tt)
-{
-  switch(tt){
-    case token_type::dest:
-      std::cout << "dest";
-    case token_type::comp:
-      std::cout << "comp";
-    case token_type::jump:
-      std::cout << "jump";
-    case token_type::identifier:
-      std::cout << "identifier";
-    case token_type::symbol:
-      std::cout << "symbol";
-    case token_type::int_const:
-      std::cout << "int_const";
-  }
-  return std::cout;
-}
+std::ostream& operator<<(std::ostream&, token_type tt);
 
 struct token
 {

@@ -12,6 +12,23 @@ const char* asm_error::what() const noexcept
   return _msg.c_str();
 }
 
+cli_asm_file_arg_missing::cli_asm_file_arg_missing() noexcept
+{
+  _msg = std::string{"no asm file input"};
+}
+
+excess_cli_args::excess_cli_args() noexcept
+{
+  _msg = std::string{"too many arguments"};
+}
+
+cli_missing_required_arg::cli_missing_required_arg(char option) noexcept
+{
+  std::stringstream ss{};
+  ss << "option '" << logbold << option << logstd << "' missing argument";
+  _msg = std::string{ss.str()};
+}
+
 asm_file_not_found::asm_file_not_found(const std::string& filename) noexcept
 {
   std::stringstream ss{};
