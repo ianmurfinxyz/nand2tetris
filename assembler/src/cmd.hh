@@ -1,18 +1,20 @@
-#ifndef _hackasm_cmd_hpp_
-#define _hackasm_cmd_hpp_
+#ifndef _HACKASM_CMD_HPP_
+#define _HACKASM_CMD_HPP_
 
 #include <cstdint>
 #include <string>
 
 enum class cmd_type
 {
-  L_CMD, 
-  A_CMD, 
-  C_CMD,
+  L_CMD,  // (<symbol>)
+  A_CMD,  // @(<symbol>|<int_const>)
+  C0_CMD, // <dest>=<comp>;<jump>
+  C1_CMD, // <dest>=<comp>
+  C2_CMD, // <comp>;<jump>
 };
 
-/** Represents an assembly command. */
-struct asm_cmd 
+/** Represents a hack assembly command. */
+struct asm_cmd
 {
   cmd_type _type;
   std::string _symbol;
@@ -22,6 +24,7 @@ struct asm_cmd
   std::string _jump;
 };
 
+/** Represents a hack binary command. */
 using bin_cmd = uint16_t;
 
 #endif

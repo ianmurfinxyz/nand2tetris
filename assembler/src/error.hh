@@ -59,6 +59,12 @@ public:
   explicit asm_file_not_found(const std::string& filename) noexcept;
 };
 
+class invalid_asm_cmd: public asm_error
+{
+public:
+  explicit invalid_asm_cmd(const std::string& asm_cmd_str, int lineno) noexcept;
+};
+
 class multiple_label_declarations: public asm_error
 {
 public:

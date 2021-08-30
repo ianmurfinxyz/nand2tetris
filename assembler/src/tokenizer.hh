@@ -41,64 +41,7 @@ namespace hackasm
     std::string _value;
   };
 
-  constexpr std::array<const char*, 28> comp_or_int_const_tokens {
-    "0"  ,
-    "1"  ,
-  };
-  constexpr std::array<const char*, 25> comp_tokens {
-    "-1" ,
-    "!D" ,
-    "!A" ,
-    "-D" ,
-    "-A" ,
-    "D+1",
-    "A+1",
-    "D-1",
-    "A-1",
-    "D+A",
-    "D-A",
-    "A-D",
-    "D&A",
-    "D|A",
-    "!M" ,
-    "-M" ,
-    "M+1",
-    "M-1",
-    "D+M",
-    "D-M",
-    "M-D",
-    "D&M",
-    "D|M",
-  };
-  constexpr std::array<const char*, 4> dest_tokens {
-    "DM" ,
-    "AM" ,
-    "AD" ,
-    "ADM",
-  };
-  constexpr std::array<const char*, 3> comp_or_dest_tokens {
-    "M"  ,
-    "D"  ,
-    "A"  ,
-  };
-  constexpr std::array<const char*, 7> jump_tokens {
-    "JGT",
-    "JEQ",
-    "JGE",
-    "JLT",
-    "JNE",
-    "JLE",
-    "JMP",
-  };
-  constexpr std::array<char, 7> symbol_tokens {
-    '@',
-    '=',
-    ';',
-    '(',
-    ')',
-  };
 
-  static constexpr const char comment_prefix = '#';
 
   class tokenizer
   {
