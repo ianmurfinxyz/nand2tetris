@@ -11,7 +11,7 @@ add_executable(assembler
         assembler/src/error.cc
         assembler/src/log.cc
         assembler/src/tokenizer.cc
-        )
+        assembler/test/test.cc)
 add_executable(virtual_machine virtual_machine/src/main.cc)
 add_executable(compiler compiler/src/main.cc)
 add_executable(emulator emulator/src/main.cc)
