@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.20)
 project(nand2tetris)
 set(CMAKE_CXX_STANDARD 20)
+
+################################################################################
+# nand2tetris
+################################################################################
+
 include_directories(${PROJECT_SOURCE_DIR}/assembler/src)
 include_directories(${PROJECT_SOURCE_DIR}/virtual_machine/src)
 include_directories(${PROJECT_SOURCE_DIR}/compiler/src)
@@ -15,3 +20,13 @@ add_executable(assembler
 add_executable(virtual_machine virtual_machine/src/main.cc)
 add_executable(compiler compiler/src/main.cc)
 add_executable(emulator emulator/src/main.cc)
+
+################################################################################
+# unit tests
+################################################################################
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/gtest/lib)
+include_directories(${PROJECT_SOURCE_DIR}/gtest/lib/googletest/include)
+include_directories(${PROJECT_SOURCE_DIR}/gtest/lib/googlemock/include)
+add_executable(test_assembler assembler/test/test.cc)
+target_link_libraries(test_assembler gtest gtest_main)
