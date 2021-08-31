@@ -52,7 +52,6 @@ public:
   explicit cli_missing_required_arg(char option) noexcept;
 };
 
-
 class asm_file_not_found: public asm_error
 {
 public:

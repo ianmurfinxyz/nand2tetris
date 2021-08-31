@@ -1,5 +1,5 @@
 # file: sum.asm
-# Test program used as input to tokenizer unit tests.
+# Test program used as input to parser unit tests.
 # Computes sum of 1 to N=10 (hardcoded input)
 
 # R0=10

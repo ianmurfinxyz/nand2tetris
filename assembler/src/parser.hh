@@ -13,6 +13,7 @@ namespace hackasm
   public:
     explicit parser(const std::string& asm_filename);
     std::optional<asm_cmd> advance();
+    void reset();
   private:
     std::ifstream _asm_file;
     int _lineno;

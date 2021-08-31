@@ -2,7 +2,8 @@
 #include <iostream>
 #include "cli.hh"
 #include "error.hh"
-#include "tokenizer.hh"
+#include "parser.hh"
+#include "writer.hh"
 
 int main(int argc, char** argv)
 {
@@ -21,23 +22,25 @@ int main(int argc, char** argv)
     std::exit(EXIT_SUCCESS);
   }
 
-  auto tokenizer_ = tokenizer{settings.in_filename};
-  auto token = tokenizer_.advance();
-  while(token.has_value()) {
-    std::cout << token.value()._type << "\n";
-    std::cout << token.value()._value << "\n";
-    std::cout << std::endl;
+  auto coder_ = coder{};
+  auto parser_ = parser{settings.in_filename};
+
+  // phase 1: add all labels to the symbol table.
+  auto asm_cmd_ = parser_.advance();
+  while(asm_cmd_.has_value()){
+    if(asm_cmd_.value()._type == cmd_type::L_CMD){
+      coder.add_symbol(asm_cmd_.value()._symbol);
+    }
+    asm_cmd_ = std::move(parser_.advance());
   }
 
-
-  // get filename from args
-  // load file
-  //
-  // phase 1:
-  //  read line-by-line looking for symbols, adding them to table
-  //
-  // phase 2:
-  //  parse line-by-line
-  //  code asm instruction into machine instruction
-  //  write out to new hack program file.
+  // phase 2: translate all asm_cmds to bin_cmds.
+  parser_.reset();
+  auto writer_ = writer{};
+  asm_cmd_ = parser_.advance();
+  while(asm_cmd_.has_value()){
+    auto bin_cmd_ = coder_.code(asm_cmd_.value());
+    writer._write(bin_cmd_);
+    asm_cmd_ = std::move(parser_.advance());
+  }
 }
