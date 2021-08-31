@@ -1,5 +1,5 @@
-#ifndef _PARSER_HPP_
-#define _PARSER_HPP_
+#ifndef _PARSER_HH_
+#define _PARSER_HH_
 
 #include <fstream>
 #include <string>
@@ -15,7 +15,6 @@ namespace hackasm
     std::optional<asm_cmd> advance();
   private:
     std::ifstream _asm_file;
-    asm_cmd _asm_cmd;
     int _lineno;
   };
 

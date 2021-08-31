@@ -1,5 +1,5 @@
-#ifndef _HACKASM_ERROR_HPP_
-#define _HACKASM_ERROR_HPP_
+#ifndef _HACKASM_ERROR_HH_
+#define _HACKASM_ERROR_HH_
 
 #include <string>
 #include <exception>

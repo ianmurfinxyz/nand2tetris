@@ -1,5 +1,5 @@
-#ifndef _hackasm_cli_hpp_
-#define _hackasm_cli_hpp_
+#ifndef _HACKASM_CLI_HH_
+#define _HACKASM_CLI_HH_
 
 #include <string>
 #include <array>

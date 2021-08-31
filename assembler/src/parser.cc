@@ -1,6 +1,7 @@
 #include <array>
 #include <regex>
 #include "parser.hh"
+#include "util.hh"
 #include "error.hh"
 
 using namespace std::string_literals;
@@ -13,9 +14,9 @@ namespace hackasm
     auto comment_rx_pattern  {R"(^\s*#+([\s\S]*)$)"s};
     auto empty_ws_rx_pattern {R"(^\s*$)"s};
     auto l_cmd_rx_pattern    {R"(^\s*\({1}\s*(\w+)\s*\){1}\s*$)"s};
-    auto a_cmd_rx_pattern    {R"(^\s*@{1}(\w+)\s*$)"s};
+    auto a_cmd_rx_pattern    {R"(^\s*@{1}\s*(\w+)\s*$)"s};
     auto c0_cmd_rx_pattern   {R"(^\s*(\w+)={1}([\s\S]+);{1}(\w+)$)"s};
-    auto c1_cmd_rx_pattern   {R"(^\s*(\w+)={1}([\s\S]+)$)"s};
+    auto c1_cmd_rx_pattern   {R"(^\s*(\w+)\s*={1}([\s\S]+)$)"s};
     auto c2_cmd_rx_pattern   {R"(^([\s\S]+);{1}([\s\S]+)$)"s};
   }
 
@@ -42,6 +43,7 @@ namespace hackasm
     auto match = std::cmatch{};
     auto rcount = 0L;
     auto skip = false;
+    auto cmd = asm_cmd{};
 
     do {
       _asm_file.getline(buff.data(), buff.size());
@@ -59,34 +61,37 @@ namespace hackasm
     }
 
     if(std::regex_match(buff.data(), match, l_cmd_rx)){
-      _asm_cmd._type = cmd_type::L_CMD;
-      _asm_cmd._symbol = match[1];
+      cmd._type = cmd_type::L_CMD;
+      cmd._symbol = strip_ws(match[1]);
     }
     else if(std::regex_match(buff.data(), match, a_cmd_rx)){
-      _asm_cmd._type = cmd_type::A_CMD;
-      _asm_cmd._symbol = match[1];
+      cmd._type = cmd_type::A_CMD;
+      cmd._symbol = match[1];
+      if(is_int_const(cmd._symbol)){
+        cmd._address = std::move(cmd._symbol);
+      }
     }
     else if(std::regex_match(buff.data(), match, c0_cmd_rx)){
-      _asm_cmd._type = cmd_type::C0_CMD;
-      _asm_cmd._dest = match[1];
-      _asm_cmd._comp = match[2];
-      _asm_cmd._jump = match[3];
+      cmd._type = cmd_type::C0_CMD;
+      cmd._dest = strip_ws(match[1]);
+      cmd._comp = strip_ws(match[2]);
+      cmd._jump = strip_ws(match[3]);
     }
     else if(std::regex_match(buff.data(), match, c1_cmd_rx)){
-      _asm_cmd._type = cmd_type::C1_CMD;
-      _asm_cmd._dest = match[1];
-      _asm_cmd._comp = match[2];
+      cmd._type = cmd_type::C1_CMD;
+      cmd._dest = strip_ws(match[1]);
+      cmd._comp = strip_ws(match[2]);
     }
     else if(std::regex_match(buff.data(), match, c2_cmd_rx)){
-      _asm_cmd._type = cmd_type::C2_CMD;
-      _asm_cmd._comp = match[1];
-      _asm_cmd._jump = match[2];
+      cmd._type = cmd_type::C2_CMD;
+      cmd._comp = strip_ws(match[1]);
+      cmd._jump = strip_ws(match[2]);
     }
     else {
       throw invalid_asm_cmd{std::string{buff.data()}, _lineno};
     }
 
-    return _asm_cmd;
+    return cmd;
   }
 
 } // hackasm
