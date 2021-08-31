@@ -26,6 +26,8 @@ public:
   /** Translates an asm_cmd to a bin_cmd. Throws if cannot translate. */
   bin_cmd code(const asm_cmd& cmd);
 
+  static constexpr hack_address initial_ram_address = 23;
+
 private:
   /** Maps between assembly mnemonics and binary instruction codes. */
   static const std::unordered_map<const char*, uint16_t> comp_codes;

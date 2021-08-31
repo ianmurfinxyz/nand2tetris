@@ -82,6 +82,7 @@ namespace hackasm
 
   coder::coder() : _next_ram_adress{static_cast<hack_address>(base_symbols.size())}
   {
+    assert(initial_ram_address == static_cast<hack_address>(base_symbols.size()));
     for(const auto [symbol, address] : coder::base_symbols) {
       _symbol_table.emplace(std::string{symbol}, address);
     }

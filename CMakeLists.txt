@@ -34,6 +34,8 @@ add_executable(test_assembler
         assembler/src/error.cc
         assembler/src/parser.cc
         assembler/src/util.cc
+        assembler/src/coder.cc
         assembler/test/cli_test.cc
-        assembler/test/parser_test.cc)
+        assembler/test/parser_test.cc
+        assembler/test/coder_test.cc)
 target_link_libraries(test_assembler gtest_main)
