@@ -4,8 +4,7 @@
 
 namespace hackasm
 {
-
-  asm_error::asm_error(const std::string& msg) noexcept : _msg{msg}{}
+  asm_error::asm_error(std::string msg) noexcept : _msg{std::move(msg)}{}
 
   const char* asm_error::what() const noexcept
   {
@@ -59,22 +58,31 @@ namespace hackasm
     _msg = ss.str();
   }
 
-  multiple_label_declarations::multiple_label_declarations(
-    const std::string& label,
-    hack_address prev,
-    hack_address curr
-  ) noexcept :
-    asm_error{}
+  duplicate_label::duplicate_label(const std::string& label) noexcept
   {
     std::stringstream ss{};
-    ss << "multiple declarations of label '"
-       << loghl << label << logstd
-       << "'; prior declaration had address '"
-       << std::hex << logbold << prev << logstd
-       << "', new declaration has address '"
-       << std::hex << logbold << curr << logstd
-       << "'\n";
+    ss << "duplicate label '" << logbold << label << logstd << "'\n";
     _msg = std::string{ss.str()};
   }
 
+  hack_address_out_of_range::hack_address_out_of_range(long long address) noexcept
+  {
+    std::stringstream ss{};
+    ss << "RAM address '" << logbold << address << logstd << "' out of range\n";
+    _msg = std::string{ss.str()};
+  }
+
+  unknown_mnemonic::unknown_mnemonic(const std::string& type, const std::string& mnemonic) noexcept
+  {
+    std::stringstream ss{};
+    ss << "unknown " << type << " mnemonic '" << logbold << mnemonic << logstd << "'\n";
+    _msg = std::string{ss.str()};
+  }
+
+  a_register_conflict::a_register_conflict(const std::string &asm_cmd_str) noexcept
+  {
+    std::stringstream ss{};
+    ss << "conflicting use of A register in instruction '" << logbold << asm_cmd_str << logstd << "'\n";
+    _msg = std::string{ss.str()};
+  }
 } // namespace hackasm

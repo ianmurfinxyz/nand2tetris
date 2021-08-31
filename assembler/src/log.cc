@@ -20,5 +20,4 @@ namespace hackasm
     }
     std::cout << logstd << message << std::endl;
   }
-
 } // namespace hackasm

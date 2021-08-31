@@ -16,6 +16,7 @@ add_executable(assembler
         assembler/src/error.cc
         assembler/src/log.cc
         assembler/src/util.cc
+        assembler/src/coder.cc
         assembler/src/parser.cc)
 add_executable(virtual_machine virtual_machine/src/main.cc)
 add_executable(compiler compiler/src/main.cc)
