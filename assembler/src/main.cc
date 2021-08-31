@@ -65,6 +65,14 @@ bin_cmd coder_code(coder& coder_, const asm_cmd& cmd)
   try {
     bin_cmd_ = coder_.code(cmd);
   }
+  catch(a_register_conflict& e){
+    log(log_level::ERROR, e.what());
+    log(log_level::INFO,
+      "A C-instruction that specifies a reference to M should specify no jump, "
+      "and visa versa; this is a best-practice to avoid conflicting use of the A register."
+    );
+    error_bit = true;
+  }
   catch(asm_error& e){
     log(log_level::ERROR, e.what());
     error_bit = true;
