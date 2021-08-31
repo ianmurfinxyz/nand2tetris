@@ -63,6 +63,40 @@ hackasm::asm_cmd build_c2_cmd(const char* comp, const char* jump)
   };
 }
 
+/**
+ * note: There are too many possible commands to test every single one, thus
+ * this test takes the approach of choosing a random but broad subset of
+ * commands and testing only those. The assumption is that if all those tested
+ * are without error then all those untested will likely be too, provided the
+ * test cases are sufficiently broad.
+ *
+ * for c0 cmds: (form <dest>=<comp>;<jump>)
+ *  valid dest mnemonics: (count 3)
+ *      D, A, AD
+ *  valid comp mnemonics: (count 18)
+ *      0, 1, -1, D, A, !D, !A, -D, -A, D+1, A+1, D-1, A-1, D+A, D-A, A-D, D&A, D|A
+ *  valid jump mnemonics: (count 7)
+ *      JGT, JEQ, JGE, JLT, JNE, JLE, JMP
+ *  giving a total of 3*18*7=378 possible c0 cmds.
+ *
+ * for c1 cmds: (form <dest>=<comp>)
+ *  valid dest mnemonics: (count 7)
+ *      M, D, DM, A, AM, AD, ADM
+ *  valid comp mnemonics: (count 28)
+ *      0, 1, -1, D, A, !D, !A, -D, -A, D+1, A+1, D-1, A-1, D+A, D-A, A-D, D&A, D|A,
+ *      M, !M, -M, M+1, M-1, D+M, M-D, D&M, D|M
+ *  giving a total of 7*28=196 possible c1 cmds.
+ *
+ * for c2 cmds: (form <comp>;<jump>)
+ *  valid comp mnemonics: (count 18)
+ *      0, 1, -1, D, A, !D, !A, -D, -A, D+1, A+1, D-1, A-1, D+A, D-A, A-D, D&A, D|A
+ *  valid jump mnemonics: (count 7)
+ *      JGT, JEQ, JGE, JLT, JNE, JLE, JMP
+ *  giving a total of 7*18=126 possible c1 cmds.
+ *
+ * thus total c commands: 378+196+126=700
+ */
+
 TEST(coder_test, code_cmds) {
   auto coder = hackasm::coder{};
   auto asm_cmd = hackasm::asm_cmd{};
