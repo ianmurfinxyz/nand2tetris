@@ -1,5 +1,5 @@
-#ifndef _HACKASM_ERROR_HPP_
-#define _HACKASM_ERROR_HPP_
+#ifndef _HACKASM_ERROR_HH_
+#define _HACKASM_ERROR_HH_
 
 #include <string>
 #include <exception>
@@ -57,6 +57,12 @@ class asm_file_not_found: public asm_error
 {
 public:
   explicit asm_file_not_found(const std::string& filename) noexcept;
+};
+
+class invalid_asm_cmd: public asm_error
+{
+public:
+  explicit invalid_asm_cmd(const std::string& asm_cmd_str, int lineno) noexcept;
 };
 
 class multiple_label_declarations: public asm_error

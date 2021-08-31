@@ -1,5 +1,5 @@
-#ifndef _hackasm_coder_hpp_
-#define _hackasm_coder_hpp_
+#ifndef _HACKASM_CODER_HH_
+#define _HACKASM_CODER_HH_
 
 #include <unordered_map>
 #include <cstdint>

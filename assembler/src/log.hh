@@ -1,5 +1,5 @@
-#ifndef _LOGGER_HPP_
-#define _LOGGER_HPP_
+#ifndef _LOGGER_HH_
+#define _LOGGER_HH_
 
 #include <iostream>
 #include <array>
