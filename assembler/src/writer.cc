@@ -28,7 +28,6 @@ namespace hackasm
       bitset[(bit_count - 1) - bit_index] = bit_chars[bit_val];
     }
     _ofile << bitset << std::endl;
-    _ofile.flush();
   }
 
 } // namespace hackasm
