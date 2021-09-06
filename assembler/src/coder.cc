@@ -6,7 +6,7 @@
 
 namespace hackasm
 {
-  const std::unordered_map<const char*, uint16_t> coder::comp_codes = {
+  const std::unordered_map<std::string, uint16_t> coder::comp_codes = {
     {"0"  , 0b0101010},
     {"1"  , 0b0111111},
     {"-1" , 0b0111010},
@@ -36,7 +36,7 @@ namespace hackasm
     {"D&M", 0b1000000},
     {"D|M", 0b1010101},
   };
-  const std::unordered_map<const char*, uint16_t> coder::dest_codes = {
+  const std::unordered_map<std::string, uint16_t> coder::dest_codes = {
     {"M"  , 0b001},
     {"D"  , 0b010},
     {"DM" , 0b011},
@@ -45,7 +45,7 @@ namespace hackasm
     {"AD" , 0b110},
     {"ADM", 0b111},
   };
-  const std::unordered_map<const char*, uint16_t> coder::jump_codes = {
+  const std::unordered_map<std::string, uint16_t> coder::jump_codes = {
     {"JGT", 0b001},
     {"JEQ", 0b010},
     {"JGE", 0b011},
@@ -54,7 +54,7 @@ namespace hackasm
     {"JLE", 0b110},
     {"JMP", 0b111},
   };
-  const std::unordered_map<const char*, hack_address> coder::base_symbols = {
+  const std::unordered_map<std::string, hack_address> coder::base_symbols = {
     {"R0"    , 0    },
     {"R1"    , 1    },
     {"R2"    , 2    },
