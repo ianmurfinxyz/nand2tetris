@@ -94,4 +94,9 @@ namespace hackasm
     return cmd;
   }
 
+  void parser::reset()
+  {
+    _asm_file.seekg(0);
+  }
+
 } // hackasm
