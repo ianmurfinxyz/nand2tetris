@@ -55,7 +55,7 @@ namespace hackasm
               << "  -h, --help           display this help text\n\n"
               << logbold << "OUTPUT FORMATS\n" << logstd
               << "  --format=bin         outputs binary hack executable.\n"
-              << "  --format=txt         outputs ascii hack executable.\n\n"
+              << "  --format=txt         outputs ascii hack executable (default).\n\n"
               << "txt format is for use with the official Nand2Tetris emulator,\n"
               << "whereas binary format is used for the emulator packaged with \n"
               << "this suite of tools.\n\n"

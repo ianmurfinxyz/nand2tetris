@@ -40,6 +40,7 @@ namespace hackasm
     {"M"  , 0b001},
     {"D"  , 0b010},
     {"DM" , 0b011},
+    {"MD" , 0b011}, // the official Pong.asm code uses this even though not in spec! :o
     {"A"  , 0b100},
     {"AM" , 0b101},
     {"AD" , 0b110},
@@ -80,11 +81,10 @@ namespace hackasm
     {"KBD"   , 24576},
   };
 
-  coder::coder() : _next_ram_adress{static_cast<hack_address>(base_symbols.size())}
+  coder::coder() : _next_ram_adress{initial_ram_address}
   {
-    assert(initial_ram_address == static_cast<hack_address>(base_symbols.size()));
-    for(const auto [symbol, address] : coder::base_symbols) {
-      _symbol_table.emplace(std::string{symbol}, address);
+    for(const auto& [symbol, address] : coder::base_symbols) {
+      _symbol_table.emplace(symbol, address);
     }
   }
 
@@ -120,6 +120,9 @@ namespace hackasm
       if(result == _symbol_table.end()){
         _symbol_table.emplace(cmd._symbol, _next_ram_adress);
         address = _next_ram_adress++;
+        if(_next_ram_adress >= max_ram_address){
+          throw out_of_memory{};
+        }
       }
       else {
         address = result->second;

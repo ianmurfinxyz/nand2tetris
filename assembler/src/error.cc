@@ -11,6 +11,13 @@ namespace hackasm
     return _msg.c_str();
   }
 
+  ofile_open_error::ofile_open_error(std::string filename) noexcept
+  {
+    std::stringstream ss{};
+    ss << "failed to open output file '" << logbold << filename << logstd << "'";
+    _msg = std::string{ss.str()};
+  }
+
   cli_asm_file_arg_missing::cli_asm_file_arg_missing() noexcept
   {
     _msg = std::string{"no asm file input"};
@@ -84,5 +91,10 @@ namespace hackasm
     std::stringstream ss{};
     ss << "conflicting use of A register in instruction '" << logbold << asm_cmd_str << logstd << "'\n";
     _msg = std::string{ss.str()};
+  }
+
+  out_of_memory::out_of_memory() noexcept
+  {
+    _msg = "exceed Hack RAM capacity; too many variables";
   }
 } // namespace hackasm

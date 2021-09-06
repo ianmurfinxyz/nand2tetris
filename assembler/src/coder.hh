@@ -9,13 +9,7 @@
 namespace hackasm
 {
 
-/**
- * The Hack computer has 32Kib of RAM and ROM, thus
- *  addresses lie within the range [0, 32767].
- */
-using hack_address = uint16_t;
-
-class coder 
+class coder
 {
 public:
   coder();
@@ -29,7 +23,11 @@ public:
    */
   bin_cmd code(const asm_cmd& cmd);
 
-  static constexpr hack_address initial_ram_address = 23;
+  /** The next address after R15 */
+  static constexpr hack_address initial_ram_address = 16;
+
+  /** The RAM address in which screen memory starts */
+  static constexpr hack_address max_ram_address = 16384;
 
 private:
   /** Maps between assembly mnemonics and binary instruction codes. */
