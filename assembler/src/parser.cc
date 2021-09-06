@@ -11,13 +11,14 @@ namespace hackasm
   namespace
   {
     constexpr auto max_line_length = 100;
-    auto comment_rx_pattern  {R"(^\s*#+([\s\S]*)$)"s};
-    auto empty_ws_rx_pattern {R"(^\s*$)"s};
-    auto l_cmd_rx_pattern    {R"(^\s*\({1}\s*(\w+)\s*\){1}\s*$)"s};
-    auto a_cmd_rx_pattern    {R"(^\s*@{1}\s*(\w+)\s*$)"s};
-    auto c0_cmd_rx_pattern   {R"(^\s*(\w+)={1}([\s\S]+);{1}(\w+)$)"s};
-    auto c1_cmd_rx_pattern   {R"(^\s*(\w+)\s*={1}([\s\S]+)$)"s};
-    auto c2_cmd_rx_pattern   {R"(^([\s\S]+);{1}([\s\S]+)$)"s};
+    auto comment_v1_rx_pattern  {R"(^\s*#+([\s\S]*)$)"s};
+    auto comment_v2_rx_pattern  {R"(^\s*(\/\/)+([\s\S]*)$)"s};
+    auto empty_ws_rx_pattern    {R"(^\s*$)"s};
+    auto l_cmd_rx_pattern       {R"(^\s*\({1}\s*([\w.$:]+)\s*\){1}\s*$)"s};
+    auto a_cmd_rx_pattern       {R"(^\s*@{1}\s*([\w.$:]+)\s*$)"s};
+    auto c0_cmd_rx_pattern      {R"(^\s*(\w+)={1}([\s\S]+);{1}(\w+)$)"s};
+    auto c1_cmd_rx_pattern      {R"(^\s*(\w+)\s*={1}([\s\S]+)$)"s};
+    auto c2_cmd_rx_pattern      {R"(^([\s\S]+);{1}([\s\S]+)$)"s};
   }
 
   parser::parser(const std::string& asm_filename) : _lineno{0}
@@ -32,7 +33,8 @@ namespace hackasm
   {
     static std::array<char, max_line_length> buff;
 
-    static const std::regex comment_rx  {comment_rx_pattern};
+    static const std::regex comment_v1_rx  {comment_v1_rx_pattern};
+    static const std::regex comment_v2_rx  {comment_v2_rx_pattern};
     static const std::regex empty_ws_rx {empty_ws_rx_pattern};
     static const std::regex l_cmd_rx    {l_cmd_rx_pattern};
     static const std::regex a_cmd_rx    {a_cmd_rx_pattern};
@@ -49,7 +51,8 @@ namespace hackasm
       _asm_file.getline(buff.data(), buff.size());
       ++_lineno;
       rcount = _asm_file.gcount();
-      skip = std::regex_match(buff.data(), match, comment_rx  ) ||
+      skip = std::regex_match(buff.data(), match, comment_v1_rx  ) ||
+             std::regex_match(buff.data(), match, comment_v2_rx  ) ||
              std::regex_match(buff.data(), match, empty_ws_rx ) ||
              rcount == 1;
     }
@@ -96,7 +99,9 @@ namespace hackasm
 
   void parser::reset()
   {
-    _asm_file.seekg(0);
+    _asm_file.clear();
+    _asm_file.seekg(0, std::ios::beg);
+    _lineno = 0;
   }
 
 } // hackasm

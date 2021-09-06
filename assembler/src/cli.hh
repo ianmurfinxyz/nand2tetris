@@ -27,7 +27,7 @@ public:
   struct settings
   {
     /** name of hack asm file to assemble. */
-    std::string in_filename;
+    std::string in_filename = "NO_INPUT";
 
     /** name of hack machine instruction output file. */
     std::string out_filename = "a.out";

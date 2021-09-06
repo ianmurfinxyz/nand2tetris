@@ -26,6 +26,12 @@ namespace hackasm
     std::string _jump;
   };
 
+  /**
+   * The Hack computer has 32Kib of RAM and ROM, thus
+   *  addresses lie within the range [0, 32767].
+   */
+  using hack_address = uint16_t;
+
   /** Represents a hack binary command. */
   using bin_cmd = uint16_t;
 

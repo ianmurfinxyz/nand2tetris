@@ -21,6 +21,12 @@ namespace hackasm
     std::string _msg;
   };
 
+  class ofile_open_error: public asm_error
+  {
+  public:
+    explicit ofile_open_error(std::string filename) noexcept;
+  };
+
   class unknown_cli_option: public asm_error
   {
   public:
@@ -85,6 +91,12 @@ namespace hackasm
   {
   public:
     explicit a_register_conflict(const std::string& asm_cmd_str) noexcept;
+  };
+
+  class out_of_memory: public asm_error
+  {
+  public:
+    explicit out_of_memory() noexcept;
   };
 
 } // namespace hackasm

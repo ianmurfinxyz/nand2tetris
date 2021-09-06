@@ -94,10 +94,18 @@ void assemble(parser& parser_, coder& coder_, writer& writer_)
   }
 }
 
-void abort_check()
+void abort_asm_check()
 {
   if(error_bit){
     log(log_level::FATAL, "aborting assembly due to errors.");
+    std::exit(EXIT_SUCCESS);
+  }
+}
+
+void abort_write_check()
+{
+  if(error_bit){
+    log(log_level::FATAL, "aborted write due to errors; file may be a partial output.");
     std::exit(EXIT_SUCCESS);
   }
 }
@@ -109,8 +117,9 @@ int main(int argc, char** argv)
     cli_.parse(argc, argv);
   }
   catch(const asm_error& e){
-    std::cout << e.what() << std::endl;
+    log(log_level::FATAL, e.what());
     cli::print_help();
+    std::exit(EXIT_SUCCESS);
   }
   const auto& settings = cli_.get_settings();
   if(settings.help_bit){
@@ -120,11 +129,19 @@ int main(int argc, char** argv)
 
   auto coder_ = coder{};
   auto parser_ = parser{settings.in_filename};
-  auto writer_ = writer{};
+  writer* writer_ = nullptr;
+  if(settings.out_fmt == hackasm::cli::HACKOUT_TEXT){
+    writer_ = new txt_writer{settings.out_filename};
+  }
+  else {
+    // TODO: implement bin_writer
+    writer_ = new txt_writer{settings.out_filename};
+  }
 
   populate_labels(parser_, coder_);
-  abort_check();
+  abort_asm_check();
   parser_.reset();
-  assemble(parser_, coder_, writer_);
-  abort_check();
+  assemble(parser_, coder_, *writer_);
+  abort_write_check();
+  delete writer_;
 }
