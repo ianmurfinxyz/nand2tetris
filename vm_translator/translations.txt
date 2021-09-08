@@ -1,0 +1,542 @@
+
+ PART I
+
+--------------------------------------------------------------------------------
+vm cmd:
+    push SEGMENT INDEX      (where SEGMENT != constant)
+asm cmds:
+    @INDEX
+    D=A
+    @SEGMENT
+    A=D+M
+    D=M
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+--------------------------------------------------------------------------------
+vm cmd:
+    push constant INDEX
+asm cmds:
+    @INDEX
+    D=A
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+--------------------------------------------------------------------------------
+vm cmd:
+    pop SEGMENT INDEX    (where SEGMENT != constant | argument)
+asm cmds:
+    @INDEX
+    D=A
+    @SEGMENT
+    D=D+M
+    @R15
+    M=D
+    @SP
+    AM=M-1
+    D=M
+    @R15
+    A=M
+    M=D
+--------------------------------------------------------------------------------
+All the following commands will be implemented as 'private' functions inserted at
+the top of the assembly program. So rather than inlining the functions at every
+command usage, will instead insert a branch to the function at every command usage.
+
+To branch will need to store the return ROM address before we jump in a known place
+so we know where to return. I will store this ROM address in R15.
+
+Will also need a label in the assembly for the return address.
+
+So lets say we have the vm code:
+
+    push 10
+    push 2
+    add
+
+we will need to translate this to:
+
+    asm code to push 10
+    ...
+    asm code to push 2
+    ...
+    @RETURN_ADDRESS_CALL_N
+    D=A
+    @ADD_START
+    0;JMP
+    (RETURN_ADDRESS_CALL_N)
+
+note that I am putting the return address in the D register before the jump
+not the R15 RAM location. This is so the boilerplate of actually setting R15
+can be inlined in the OP code to avoid repeating it. This will reduce the total
+generated asm commands.
+--------------------------------------------------------------------------------
+vm cmd:
+    add
+asm cmds:
+    (ADD_START)
+    @R15
+    M=D
+    @SP
+    AM=M-1
+    D=M
+    A=A-1
+    M=D+M
+    @R15
+    A=M
+    0;JMP
+--------------------------------------------------------------------------------
+vm cmd:
+    sub
+asm cmd:
+    (SUB_START)
+    @R15
+    M=D
+    @SP
+    AM=M-1
+    D=M
+    A=A-1
+    M=M-D
+    @R15
+    A=M
+    0;JMP
+--------------------------------------------------------------------------------
+note: inline this cmd, don't branch to it.
+vm cmd:
+    neg
+asm cmd:
+    @SP
+    A=M-1
+    M=-M
+--------------------------------------------------------------------------------
+vm cmd:
+    eq
+asm cmds:
+    (EQ_START)
+    @R15
+    M=D
+    @SP
+    AM=M-1
+    D=M
+    A=A-1
+    D=M-D
+    M=0
+    @EQ_END
+    D;JNE
+    @SP
+    A=M-1
+    M=-1
+    (EQ_END)
+    @R15
+    A=M
+    0;JMP
+--------------------------------------------------------------------------------
+vm cmd:
+    gt
+asm cmds:
+    (GT_START)
+    @R15
+    M=D
+    @SP
+    AM=M-1
+    D=M
+    A=A-1
+    D=M-D
+    M=0
+    @GT_END
+    D;JLE
+    @SP
+    A=M-1
+    M=-1
+    (GT_END)
+    @R15
+    A=M
+    0;JMP
+--------------------------------------------------------------------------------
+vm cmd:
+    lt
+asm cmds:
+    (LT_START)
+    @R15
+    M=D
+    @SP
+    AM=M-1
+    D=M
+    A=A-1
+    D=M-D
+    M=0
+    @LT_END
+    D;JGE
+    @SP
+    A=M-1
+    M=-1
+    (LT_END)
+    @R15
+    A=M
+    0;JMP
+--------------------------------------------------------------------------------
+vm cmd:
+    and
+asm cmds:
+    (AND_START)
+    @R15
+    M=D
+    @SP
+    AM=M-1
+    D=M
+    A=A-1
+    M=D&M
+    @R15
+    A=M
+    0;JMP
+--------------------------------------------------------------------------------
+vm cmd:
+    or
+asm cmds:
+    (OR_START)
+    @R15
+    M=D
+    @SP
+    AM=M-1
+    D=M
+    A=A-1
+    M=D|M
+    @R15
+    A=M
+    0;JMP
+--------------------------------------------------------------------------------
+note: inline this cmd, don't branch to it.
+vm cmd:
+    not
+asm cmd:
+    @SP
+    A=M-1
+    M=!M
+--------------------------------------------------------------------------------
+
+ PART II - implementing the run-time execution model
+
+--------------------------------------------------------------------------------
+note: labels have scope; the function they are declared in. Further note that
+all labels are defined in a function because all vm commands are part of functions.
+The root function is 'main' as normal.
+
+note: labels consist of: alphanum, underscore (_), dot (.), and (:) but cannot start
+with a digit.
+
+vm cmd:
+    label LABEL
+asm cmds:
+    none
+
+note: the label vm cmd does not output assembly, it simply registers the current
+location in it's function. This location will be maintained internally by the translator
+and used when translating goto and goto-if vm cmds. It is analagous to labels in asm
+code.
+--------------------------------------------------------------------------------
+note: the goto LABEL and the label LABEL must be located in the same function, i.e.
+we cannot jump into another function.
+
+vm cmd:
+    goto LABEL
+asm cmds:
+
+--------------------------------------------------------------------------------
+vm cmd:
+    if-goto LABEL
+--------------------------------------------------------------------------------
+note: this command marks the beginning of a function definition.
+note: nVars is a count of the functions local variables (not its arguments).
+
+vm cmd:
+    function FUNCTION_NAME nVars
+--------------------------------------------------------------------------------
+note: nArgs is the count of arguments that were push onto the stack beforehand.
+note: FUNCTION_NAME will be the name of a function in some vm file.
+
+vm cmd:
+    call FUNC nArgs
+asm cmds:
+    output       psuedo
+    ------       ------
+
+    @RET_LABEL   push return address
+    D=M
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+
+    @LCL         push LCL
+    D=M
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+
+    @ARG         push ARG
+    D=M
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+
+    @THIS         push THIS
+    D=M
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+
+    @THAT         push THAT
+    D=M
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+
+    @SP           ARG=SP-5-nArgs
+    D=M
+    @5
+    D=D-A
+    @nArgs
+    D=D-A
+    @ARG
+    M=D
+
+    @SP           LCL=SP
+    D=M
+    @LCL
+    M=D
+
+    @FUNC         goto FUNC
+    0;jmp
+
+    (RET_LABEL)   insert return address label
+
+note: this is quite a long series of cmds that I don't want to inline into
+every call, so will instead create a routine in the .asm file's header code
+block which will handle the call and jump to that for each call. I will need
+to annonymise this routine so it cannot know the return address label or the
+label of the function to call, so these values will have to be stored in the
+temps. Further we know the number of args so this will also have to be passed
+to the routine via a temp.
+
+- will store the return ROM address in D
+- the function to call ROM address in R14
+- will store the nArgs in R13
+
+asm cmds:
+    the following call routine is inserted at the top of the generated .asm file.
+    -----------------------
+    // note: don't increment SP so it points not to 1 past the end
+    // but instead to the element we just inserted, this allows us
+    // to reduce the commands needed to push the next set of values.
+    (CALL_START)
+    @SP
+    A=M
+    M=D
+    @LCL
+    D=M
+    @SP
+    AM=M+1
+    M=D
+    @ARG
+    D=M
+    @SP
+    AM=M+1
+    M=D
+    @THIS
+    D=M
+    @SP
+    AM=M+1
+    M=D
+    @THAT
+    D=M
+    @SP
+    AM=M+1
+    M=D
+    @SP           ARG=SP-4-nArgs
+    D=M
+    @4
+    D=D-A
+    @R13
+    D=D-M
+    @ARG
+    M=D
+    @SP           LCL=SP
+    DM=M+1
+    @LCL
+    M=D
+    @R14
+    A=M
+    0;JMP
+    ----------------------
+
+    when actually encoutering a call vm cmd will insert the following at the
+    call site itself:
+
+    note: N is a count of the number of calls made (counted internally by the translator).
+
+    reminder, we are translating the vm cmd:
+        call FUNC nArgs
+
+    ----------------------
+    // store nargs in R13
+    @nArgs
+    D=A
+    @R13
+    M=D
+    // store function to call address in R14
+    @FUNC
+    D=A
+    @R14
+    M=D
+    // store return address in D
+    @RET_ADDRESS_CALL_N
+    D=A
+    // jump to CALL_START
+    @CALL_START
+    0;JMP
+    // insert return label
+    (RET_ADDRESS_CALL_N)
+
+    so without the comments:
+
+    @nArgs
+    D=A
+    @R13
+    M=D
+    @FUNC
+    D=A
+    @R14
+    M=D
+    @RET_ADDRESS_CALL_N
+    D=A
+    @CALL_START
+    0;JMP
+    (RET_ADDRESS_CALL_N)
+
+    ----------------------
+
+--------------------------------------------------------------------------------
+vm cmd:
+    function functionName nVars
+
+    note: FUNC_LABEL needs to be calculated as a combination of the name of the
+    file (i.e. class) that contains the function and the function name itself,
+    the symbol will take the form:
+            Filename.functionName   or    Classname.functionName
+
+    further note the casing, class names in hack are expected to be UpperCamelCase
+    and function names lowerCamelCase
+
+    note: this naming convention requires the translator to keep track of which
+    class the function is a member of.
+
+asm cmds:
+    (Classname.functionName)
+    --- repeat nVars times
+    @SP
+    AM=M+1
+    A=A-1
+    M=0
+    ---
+--------------------------------------------------------------------------------
+vm cmd
+    return
+
+    note: using R13 for the 'frame' temporary from the book's psuedocode
+    note: using R14 for the 'retAddr' temporary
+
+asm cmds:
+    asm            psuedo
+    ---            ------
+    @LCL           frame=LCL
+    D=M
+    @R13
+    M=D
+
+    @5             retAddr=*(frame-5)   i.e. R14=return address
+    AD=D-A
+    D=M            D=return address
+    @R14
+    M=D
+
+    @SP            *ARG=pop()
+    AM=M-1
+    D=M
+    @ARG
+    M=D
+
+    D=A+1          SP=ARG+1
+    @SP
+    M=D
+
+    @R13           THAT=*(frame-1)
+    AM=M-1
+    D=M
+    @THAT
+    M=D
+
+    @R13           THIS=*(frame-2)
+    AM=M-1
+    D=M
+    @THIS
+    M=D
+
+    @R13           THIS=*(frame-3)
+    AM=M-1
+    D=M
+    @ARG
+    M=D
+
+    @R13           LCL=*(frame-4)
+    AM=M-1
+    D=M
+    @LCL
+    M=D
+
+    @R14           goto return address
+    A=M
+    0;JMP
+
+--------------------------------------------------------------------------------
+FULL TRANSLATION PROCESS
+
+- there will be multiple input files; one file must be Main.vm (the entry point)
+- each file will be a class containing methods
+- Main.vm will contain a main method; the program entry point
+- a full hack program consists of multiple class files in a common dir
+
+so the process of translating a hack program will be:
+1. load all file names in common dir
+2. open Main.vm
+3. write common 'boilerplate' header to output program_name.asm (header contains
+   the init code and the common private methods, i.e. implementations of eq,gt,lt etc).
+4. translate Main.vm line by line writing each line to the output file.
+5. close Main.vm
+6. open each other file in no particular order, translating line by line and closing
+
+
+
+
+
+
+
+
+
+
+
+
+
+
