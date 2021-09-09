@@ -19,4 +19,12 @@ namespace hackvmt
     _msg = ss.str();
   }
 
+  expected_token::expected_token(const std::string &expected, const std::string& received)
+  {
+    std::stringstream ss{};
+    ss << "expected " << logbold << expected << logstd
+       << "' token but received " << logbold << received << logstd << ".";
+    _msg = ss.str();
+  }
+
 } // namespace hackvmt

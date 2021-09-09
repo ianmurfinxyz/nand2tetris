@@ -6,11 +6,11 @@ namespace hackvmt
 {
   constexpr const char* comment_prefex {"//"};
 
-  tokenizer::tokenizer(const std::string& filename)
+  tokenizer::tokenizer(const std::string& vm_filename)
   {
-    _vmfile.open(filename);
+    _vmfile.open(vm_filename);
     if(!_vmfile){
-      throw vmfile_open_error{filename};
+      throw vmfile_open_error{vm_filename};
     }
   }
 

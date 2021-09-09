@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 # nand2tetris
 ################################################################################
 
+include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/assembler/src)
 include_directories(${PROJECT_SOURCE_DIR}/vm_translator/src)
 include_directories(${PROJECT_SOURCE_DIR}/compiler/src)
@@ -55,5 +56,7 @@ add_executable(test_nand2tetris
         assembler/test/coder_test.cc
         vm_translator/src/error.cc
         vm_translator/src/tokenizer.cc
-        vm_translator/test/tokenizer_test.cc)
+        vm_translator/src/parser.cc
+        vm_translator/test/tokenizer_test.cc
+        vm_translator/test/parser_test.cc)
 target_link_libraries(test_nand2tetris gtest_main)

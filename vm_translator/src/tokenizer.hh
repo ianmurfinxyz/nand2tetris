@@ -12,7 +12,7 @@ namespace hackvmt
   {
   public:
     using token_type = std::string;
-    explicit tokenizer(const std::string& filename);
+    explicit tokenizer(const std::string& vm_filename);
     std::optional<token_type> advance();
   private:
     static bool is_space(int c);

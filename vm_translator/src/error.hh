@@ -23,7 +23,13 @@ namespace hackvmt
   class vmfile_open_error : public vmt_error
   {
   public:
-    vmfile_open_error(const std::string& filename);
+    explicit vmfile_open_error(const std::string& filename);
+  };
+
+  class expected_token : public vmt_error
+  {
+  public:
+    explicit expected_token(const std::string& expected, const std::string& received);
   };
 
 } // namespace hackvmt
