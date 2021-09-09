@@ -19,7 +19,21 @@ add_executable(assembler
         assembler/src/coder.cc
         assembler/src/parser.cc
         assembler/src/writer.cc)
-add_executable(vm_translator vm_translator/src/main.cc)
+add_executable(vm_translator
+        vm_translator/src/main.cc
+        vm_translator/src/tokenizer.cc
+        vm_translator/src/tokenizer.hh
+        vm_translator/src/parser.cc
+        vm_translator/src/parser.hh
+        vm_translator/src/coder.cc
+        vm_translator/src/coder.hh
+        vm_translator/src/writer.cc
+        vm_translator/src/writer.hh
+        vm_translator/src/error.cc
+        vm_translator/src/error.hh
+        vm_translator/src/log.cc
+        vm_translator/src/log.hh
+        vm_translator/test/tokenizer_test.cc)
 add_executable(compiler compiler/src/main.cc)
 add_executable(emulator emulator/src/main.cc)
 
@@ -30,7 +44,7 @@ add_executable(emulator emulator/src/main.cc)
 add_subdirectory(${PROJECT_SOURCE_DIR}/gtest/lib)
 include_directories(${PROJECT_SOURCE_DIR}/gtest/lib/googletest/include)
 include_directories(${PROJECT_SOURCE_DIR}/gtest/lib/googlemock/include)
-add_executable(test_assembler
+add_executable(test_nand2tetris
         assembler/src/cli.cc
         assembler/src/error.cc
         assembler/src/parser.cc
@@ -38,5 +52,8 @@ add_executable(test_assembler
         assembler/src/coder.cc
         assembler/test/cli_test.cc
         assembler/test/parser_test.cc
-        assembler/test/coder_test.cc)
-target_link_libraries(test_assembler gtest_main)
+        assembler/test/coder_test.cc
+        vm_translator/src/error.cc
+        vm_translator/src/tokenizer.cc
+        vm_translator/test/tokenizer_test.cc)
+target_link_libraries(test_nand2tetris gtest_main)
