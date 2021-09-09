@@ -27,4 +27,35 @@ namespace hackvmt
     _msg = ss.str();
   }
 
+  unknown_cli_option::unknown_cli_option(int opt) noexcept
+  {
+    std::stringstream ss{};
+    ss << "unknown option '" << logbold << std::to_string(opt) << logstd << "'\n";
+    _msg = ss.str();
+  }
+
+  cli_missing_required_arg::cli_missing_required_arg(char option) noexcept
+  {
+    std::stringstream ss{};
+    ss << "option '" << logbold << option << logstd << "' missing argument";
+    _msg = std::string{ss.str()};
+  }
+
+  cli_missing_input::cli_missing_input() noexcept
+  {
+    _msg = "missing input files; nothing to translate.";
+  }
+
+  cli_missing_main::cli_missing_main() noexcept
+  {
+    _msg = "missing Main.vm input file; program has no entry point.";
+  }
+
+  cli_expected_vm_file::cli_expected_vm_file(const std::string &received) noexcept
+  {
+    std::stringstream ss{};
+    ss << "expected .vm file, received '" << logbold << received << logstd << "'.";
+    _msg = std::string{ss.str()};
+  }
+
 } // namespace hackvmt
