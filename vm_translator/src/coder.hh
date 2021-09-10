@@ -9,6 +9,12 @@
 namespace hackvmt
 {
 
+  // TODO: boot code
+  // TODO: setting up class and function names
+  // TODO: checking in set function if is main function; throwing
+  //       error on end if no main encountered.
+  // TODO: double check I have implemented the entire specification.
+
   class code_writer
   {
   public:
@@ -39,6 +45,9 @@ namespace hackvmt
     std::ofstream _ofile;
     std::string _class_name;
     std::string _function_name;
+
+    /** Running count of method calls for the current class. */
+    int _call_count;
   };
 
 } // namespace hackvmt

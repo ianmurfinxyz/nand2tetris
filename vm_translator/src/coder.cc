@@ -469,47 +469,241 @@ namespace hackvmt
 
   void code_writer::code_arithmetic(const vm_cmd& cmd, std::string& out_code)
   {
+    static auto add_call_count = 0;
+    static auto sub_call_count = 0;
 
+    auto return_label = std::string{};
+    auto jump_label = std::string{};
+
+    if(cmd._keyword == "add"){
+      return_label = "RET_ADDRESS_ADD";
+      return_label += std::to_string(add_call_count++);
+      jump_label = "ADD_START";
+    }
+
+    else if(cmd._keyword == "sub"){
+      return_label = "RET_ADDRESS_SUB";
+      return_label += std::to_string(sub_call_count++);
+      jump_label = "SUB_START";
+    }
+
+    // note: inlining this cmd since it is short.
+    else if(cmd._keyword == "neg"){
+      out_code += "@SP\n"
+                  "A=M-1\n"
+                  "M=-M\n";
+      return;
+    }
+
+    else assert(0);
+
+    out_code += '@';
+    out_code += return_label;
+    out_code += '\n';
+    out_code += "D=A\n";
+    out_code += '@';
+    out_code += jump_label;
+    out_code += '\n';
+    out_code += "0;JMP\n";
+    out_code += '(';
+    out_code += return_label;
+    out_code += ")\n";
   }
 
   void code_writer::code_comparison(const vm_cmd& cmd, std::string& out_code)
   {
+    static auto eq_call_count = 0;
+    static auto gt_call_count = 0;
+    static auto lt_call_count = 0;
 
+    auto return_label = std::string{};
+    auto jump_label = std::string{};
+
+    if(cmd._keyword == "eq"){
+      return_label = "RETURN_ADDRESS_EQ";
+      return_label += std::to_string(eq_call_count++);
+      jump_label = "EQ_START";
+    }
+
+    else if(cmd._keyword == "gt"){
+      return_label = "RETURN_ADDRESS_GT";
+      return_label += std::to_string(gt_call_count++);
+      jump_label = "GT_START";
+    }
+
+    else if(cmd._keyword == "lt"){
+      return_label = "RETURN_ADDRESS_LT";
+      return_label += std::to_string(lt_call_count++);
+      jump_label = "LT_START";
+    }
+
+    else assert(0);
+
+    out_code += '@';
+    out_code += return_label;
+    out_code += '\n';
+    out_code += "D=A\n";
+    out_code += '@';
+    out_code += jump_label;
+    out_code += '\n';
+    out_code += "0;JMP\n";
+    out_code += '(';
+    out_code += return_label;
+    out_code += ")\n";
   }
 
   void code_writer::code_logical(const vm_cmd& cmd, std::string& out_code)
   {
+    static auto and_call_count = 0;
+    static auto or_call_count = 0;
 
+    auto return_label = std::string{};
+    auto jump_label = std::string{};
+
+    if(cmd._keyword == "and"){
+      return_label = "RETURN_ADDRESS_AND";
+      return_label += std::to_string(and_call_count++);
+      jump_label = "AND_START";
+    }
+
+    else if(cmd._keyword == "or"){
+      return_label = "RETURN_ADDRESS_OR";
+      return_label += std::to_string(or_call_count++);
+      jump_label = "OR_START";
+    }
+
+    // note: inlining this cmd since it is short.
+    else if(cmd._keyword == "not"){
+      out_code += "@SP\n"
+                  "A=M-1\n"
+                  "M=!M\n";
+      return;
+    }
+
+    else assert(0);
+
+    out_code += '@';
+    out_code += return_label;
+    out_code += '\n';
+    out_code += "D=A\n";
+    out_code += '@';
+    out_code += jump_label;
+    out_code += '\n';
+    out_code += "0;JMP\n";
+    out_code += '(';
+    out_code += return_label;
+    out_code += ")\n";
   }
 
   void code_writer::code_call(const vm_cmd& cmd, std::string& out_code)
   {
+    const auto& function_name = cmd._arg0;
+    const auto& arg_count = cmd._arg1;
 
+    auto jump_label = _class_name;
+    jump_label += '.';
+    jump_label += function_name;
+
+    auto return_label = _class_name;
+    return_label += '.';
+    return_label += function_name;
+    return_label += "$ret.";
+    return_label += std::to_string(_call_count++);
+
+    out_code += '@';
+    out_code += arg_count;
+    out_code += '\n';
+    out_code += "D=A\n"
+                "@R13\n"
+                "M=D\n";
+    out_code += '@';
+    out_code += jump_label;
+    out_code += '\n';
+    out_code += "D=A\n"
+                "@R14\n"
+                "M=D\n";
+    out_code += '@';
+    out_code += return_label;
+    out_code += '\n';
+    out_code += "D=A\n";
+    out_code += "@CALL_START\n"
+                "0;JMP\n";
+    out_code += '(';
+    out_code += return_label;
+    out_code += ")\n";
   }
 
   void code_writer::code_function(const vm_cmd& cmd, std::string& out_code)
   {
+    const auto& function_name = cmd._arg0;
+    const auto& var_count = cmd._arg1;
 
+    auto entry_label = _class_name;
+    entry_label += '.';
+    entry_label += function_name;
+
+    out_code += '(';
+    out_code += entry_label;
+    out_code += ")\n";
+
+    auto var_count_as_int = std::stoi(var_count);
+    while(var_count_as_int > 0){
+      out_code += "@SP\n"
+                  "AM=M+1\n"
+                  "A=A-1\n"
+                  "M=0\n";
+      --var_count_as_int;
+    }
   }
 
   void code_writer::code_return(const vm_cmd& cmd, std::string& out_code)
   {
-
+    out_code = "@RETURN_START\n"
+               "0;JMP\n";
   }
 
   void code_writer::code_goto(const vm_cmd& cmd, std::string& out_code)
   {
+    auto label = cmd._arg0;
 
+    auto goto_label = _function_name;
+    goto_label += '$';
+    goto_label += label;
+
+    out_code += '@';
+    out_code += goto_label;
+    out_code += '\n';
+    out_code += "0;JMP\n";
   }
 
   void code_writer::code_if_goto(const vm_cmd& cmd, std::string& out_code)
   {
+    auto label = cmd._arg0;
 
+    auto goto_label = _function_name;
+    goto_label += '$';
+    goto_label += label;
+
+    out_code += "@SP\n"
+                "AM=M-1\n"
+                "D=M\n";
+    out_code += '@';
+    out_code += goto_label;
+    out_code += '\n';
+    out_code += "D;JNE\n";
   }
 
   void code_writer::code_label(const vm_cmd& cmd, std::string& out_code)
   {
+    auto label = cmd._arg0;
 
+    auto goto_label = _function_name;
+    goto_label += '$';
+    goto_label += label;
+
+    out_code += '(';
+    out_code += goto_label;
+    out_code += ")\n";
   }
 
 } // namespace hackvmt
