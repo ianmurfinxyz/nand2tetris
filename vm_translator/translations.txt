@@ -3,11 +3,11 @@
 
 --------------------------------------------------------------------------------
 vm cmd:
-    push SEGMENT INDEX      (where SEGMENT != constant)
+    push SEGMENT INDEX      (where SEGMENT == local|argument|this|that)
 asm cmds:
     @INDEX
     D=A
-    @SEGMENT
+    @SEGMENT_POINTER
     A=D+M
     D=M
     @SP
@@ -28,6 +28,39 @@ asm cmds:
     M=M+1
 --------------------------------------------------------------------------------
 vm cmd:
+    push pointer 0
+asm cmds:
+    @THIS
+    D=M
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+vm cmd:
+    push pointer 1
+asm cmds:
+    @THAT
+    D=M
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+--------------------------------------------------------------------------------
+vm cmd:
+    push static INDEX
+asm cmd:
+    @ClassName.INDEX       // will create a asm variable when assembled
+    D=M
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
+
+--------------------------------------------------------------------------------
+vm cmd:
     pop SEGMENT INDEX    (where SEGMENT != constant | argument)
 asm cmds:
     @INDEX
@@ -42,6 +75,25 @@ asm cmds:
     @R15
     A=M
     M=D
+
+vm cmd:
+    pop pointer 0
+asm cmds:
+    @SP
+    AM=M-1
+    D=M
+    @THIS
+    M=D
+
+vm cmd:
+    pop pointer 1
+asm cmds:
+    @SP
+    AM=M-1
+    D=M
+    @THAT
+    M=D
+
 --------------------------------------------------------------------------------
 All the following commands will be implemented as 'private' functions inserted at
 the top of the assembly program. So rather than inlining the functions at every
@@ -230,30 +282,40 @@ with a digit.
 
 vm cmd:
     label LABEL
-asm cmds:
-    none
 
-note: the label vm cmd does not output assembly, it simply registers the current
-location in it's function. This location will be maintained internally by the translator
-and used when translating goto and goto-if vm cmds. It is analagous to labels in asm
-code.
+    note: simply injects a label into the output stream. The label must have the
+    form:
+        functionName$label
+
+asm cmds:
+    (functionName$label)
+
 --------------------------------------------------------------------------------
 note: the goto LABEL and the label LABEL must be located in the same function, i.e.
 we cannot jump into another function.
 
 vm cmd:
     goto LABEL
+
+    note: if-goto and the label must be located in the same function. Will be
+    able to test this since the label contains the function name.
 asm cmds:
+    @LABEL
+    0;JMP
 
 --------------------------------------------------------------------------------
 vm cmd:
     if-goto LABEL
---------------------------------------------------------------------------------
-note: this command marks the beginning of a function definition.
-note: nVars is a count of the functions local variables (not its arguments).
 
-vm cmd:
-    function FUNCTION_NAME nVars
+    note: if-goto and the label must be located in the same function. Will be
+    able to test this since the label contains the function name.
+asm cmds:
+    @SP
+    AM=M-1
+    D=M
+    @LABEL
+    D;JNE
+
 --------------------------------------------------------------------------------
 note: nArgs is the count of arguments that were push onto the stack beforehand.
 note: FUNCTION_NAME will be the name of a function in some vm file.

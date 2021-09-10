@@ -7,7 +7,7 @@
 
 namespace hackvmt
 {
-  std::unordered_map<std::string, parser::vm_cmd_type> parser::keyword_cmd_map {
+  std::unordered_map<std::string, vm_cmd_type> parser::keyword_cmd_map {
     {"push", vm_cmd_type::CMD_PUSH},
     {"pop", vm_cmd_type::CMD_POP},
     {"add", vm_cmd_type::CMD_ARITHMETIC},
@@ -44,7 +44,7 @@ namespace hackvmt
 
   parser::parser(const std::string &vm_filename) : _tokenizer{vm_filename} {}
 
-  std::optional<parser::vm_cmd> parser::advance()
+  std::optional<vm_cmd> parser::advance()
   {
     auto keyword = extract_keyword();
     if(!keyword.has_value()){
@@ -54,10 +54,24 @@ namespace hackvmt
     _cmd._keyword = keyword.value();
     switch(_cmd._type){
       case vm_cmd_type::CMD_PUSH:
-      case vm_cmd_type::CMD_POP:
-        _cmd._arg0 = extract_segment();
-        _cmd._arg1 = extract_number("index");
+      case vm_cmd_type::CMD_POP: {
+        auto segment = extract_segment();
+        auto index = extract_number("index");
+        if(segment == "pointer"){
+          if(!(index == "0" || index == "1")){
+            throw invalid_pointer_segment_index{index};
+          }
+        }
+        else if(segment == "temp"){
+          auto index_as_int = std::stoi(index);
+          if(!(0 <= index_as_int && index_as_int <= 7)){
+            throw invalid_temp_segment_index{index};
+          }
+        }
+        _cmd._arg0 = std::move(segment);
+        _cmd._arg1 = std::move(index);
         break;
+      }
       case vm_cmd_type::CMD_CALL:
         _cmd._arg0 = extract_label();
         _cmd._arg1 = extract_number("nArgs");
@@ -80,7 +94,7 @@ namespace hackvmt
     return _cmd;
   }
 
-  parser::vm_cmd_type parser::get_cmd_type(const token_type& keyword)
+  vm_cmd_type parser::get_cmd_type(const token_type& keyword)
   {
     auto iter = keyword_cmd_map.find(keyword);
     if(iter == keyword_cmd_map.end()){
@@ -116,7 +130,7 @@ namespace hackvmt
     return std::regex_match(candidate, match, rx) && match[0].length() == candidate.length();
   }
 
-  std::optional<parser::token_type> parser::extract_keyword()
+  std::optional<token_type> parser::extract_keyword()
   {
     auto token = _tokenizer.advance();
     if(!token.has_value()){
@@ -128,7 +142,7 @@ namespace hackvmt
     return token.value();
   }
 
-  parser::token_type parser::extract_segment()
+  token_type parser::extract_segment()
   {
     auto token = _tokenizer.advance();
     if(!token.has_value()){
@@ -140,7 +154,7 @@ namespace hackvmt
     return token.value();
   }
 
-  parser::token_type parser::extract_number(const char* number_context)
+  token_type parser::extract_number(const char* number_context)
   {
     auto token = _tokenizer.advance();
     if(!token.has_value()){
@@ -152,7 +166,7 @@ namespace hackvmt
     return token.value();
   }
 
-  parser::token_type parser::extract_label()
+  token_type parser::extract_label()
   {
     auto token = _tokenizer.advance();
     if(!token.has_value()){

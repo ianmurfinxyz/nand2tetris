@@ -5,66 +5,13 @@
 #include <optional>
 #include <unordered_map>
 #include "tokenizer.hh"
+#include "vm_cmd.hh"
 
 namespace hackvmt
 {
-  /**
-   * Parses the hack VM grammar which consists of the
-   * following rules:
-   *
-   *  push command: 'push' segment index
-   *
-   *  pop command: 'pop' segment index
-   *
-   *  arithmetic commands: 'add'|'sub'|'neg'
-   *
-   *  comparison commands: 'eq'|'gt'|'lt'
-   *
-   *  logical commands: 'and'|'or'|'not'
-   *
-   *  call command: 'call' f nArgs
-   *
-   *  function cmd: 'function' f nVars
-   *
-   *  return command: 'return'
-   *
-   *  goto command: 'goto' label
-   *
-   *  if-goto command: 'if-goto' label
-   *
-   *  label command: 'label' label
-   *
-   *  where segment is:
-   *    'argument'|'local'|'static'|'constant'|'this'|'that'|'pointer'|'temp'
-   */
   class parser
   {
   public:
-    using token_type = tokenizer::token_type;
-
-    enum class vm_cmd_type
-    {
-      CMD_PUSH,
-      CMD_POP,
-      CMD_ARITHMETIC,
-      CMD_COMPARISON,
-      CMD_LOGICAL,
-      CMD_CALL,
-      CMD_FUNCTION,
-      CMD_RETURN,
-      CMD_GOTO,
-      CMD_IF_GOTO,
-      CMD_LABEL,
-    };
-
-    struct vm_cmd
-    {
-      vm_cmd_type _type;
-      token_type _keyword;
-      token_type _arg0;
-      token_type _arg1;
-    };
-
     explicit parser(const std::string& vm_filename);
     std::optional<vm_cmd> advance();
 

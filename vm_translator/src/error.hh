@@ -62,6 +62,18 @@ namespace hackvmt
     explicit cli_expected_vm_file(const std::string& received) noexcept;
   };
 
+  class invalid_pointer_segment_index : public vmt_error
+  {
+  public:
+    explicit invalid_pointer_segment_index(const std::string& index) noexcept;
+  };
+
+  class invalid_temp_segment_index : public vmt_error
+  {
+  public:
+    explicit invalid_temp_segment_index(const std::string& index) noexcept;
+  };
+
 } // namespace hackvmt
 
 #endif //NAND2TETRIS_ERROR_HH

@@ -14,7 +14,7 @@ namespace hackvmt
     }
   }
 
-  std::optional<tokenizer::token_type> tokenizer::advance()
+  std::optional<token_type> tokenizer::advance()
   {
     _token.clear();
 

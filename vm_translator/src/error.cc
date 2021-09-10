@@ -58,4 +58,20 @@ namespace hackvmt
     _msg = std::string{ss.str()};
   }
 
+  invalid_pointer_segment_index::invalid_pointer_segment_index(const std::string &index) noexcept
+  {
+    std::stringstream ss{};
+    ss << "invalid pointer segment index '" << logbold << index << logstd << "'; "
+       << "index must be 0 or 1.";
+    _msg = std::string{ss.str()};
+  }
+
+  invalid_temp_segment_index::invalid_temp_segment_index(const std::string &index) noexcept
+  {
+    std::stringstream ss{};
+    ss << "invalid temp segment index '" << logbold << index << logstd << "'; "
+       << "index must be within the range [0,7].";
+    _msg = std::string{ss.str()};
+  }
+
 } // namespace hackvmt

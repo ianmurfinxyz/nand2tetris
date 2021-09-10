@@ -4,6 +4,7 @@
 #include <string>
 #include <optional>
 #include <fstream>
+#include "vm_cmd.hh"
 
 namespace hackvmt
 {
@@ -11,7 +12,6 @@ namespace hackvmt
   class tokenizer
   {
   public:
-    using token_type = std::string;
     explicit tokenizer(const std::string& vm_filename);
     std::optional<token_type> advance();
   private:

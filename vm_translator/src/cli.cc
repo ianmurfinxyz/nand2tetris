@@ -44,6 +44,7 @@ namespace hackvmt
 
   void cli::print_help()
   {
+    // TODO: update the help msg to that for the translator
     std::cout << logbold << "USAGE\n" << logstd
               << "  hackasm [OPTION]... FILE\n\n"
               << "assemble hack assembly file to hack executable file.\n\n"

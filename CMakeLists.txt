@@ -34,7 +34,7 @@ add_executable(vm_translator
         vm_translator/src/error.hh
         vm_translator/src/log.cc
         vm_translator/src/log.hh
-        vm_translator/test/tokenizer_test.cc vm_translator/src/cli.cc vm_translator/src/cli.hh)
+        vm_translator/test/tokenizer_test.cc vm_translator/src/cli.cc vm_translator/src/cli.hh vm_translator/src/vm_cmd.hh)
 add_executable(compiler compiler/src/main.cc)
 add_executable(emulator emulator/src/main.cc)
 
